@@ -8,7 +8,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Token', (accounts) => {
+contract('Token', ([deployer]) => {
     let token 
 
     beforeEach(async () => {
@@ -34,6 +34,11 @@ contract('Token', (accounts) => {
         it('tracks the totalSupply', async () => {
             const totalSupply = await token.totalSupply()
             totalSupply.toString().should.equal('1000000000000000000000000')
+        })
+
+        it('assign totalSupply to deployer', async () => {
+            const balanceOf = await token.balanceOf(deployer) //the deployer is always the first account on the blockchain
+            balanceOf.toString().should.equal('1000000000000000000000000')
         })
     })
 })

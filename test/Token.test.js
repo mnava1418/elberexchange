@@ -12,7 +12,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Token', ([deployer, receiver]) => {
+contract('Token', ([deployer, receiver, exchange]) => {
     let token
     let totalSupply = getTokens(1000000)
 
@@ -70,9 +70,9 @@ contract('Token', ([deployer, receiver]) => {
                 const event = log.args
 
                 log.event.should.equal('Transfer')
-                event.from.should.equal(deployer)
-                event.to.should.equal(receiver)
-                event.value.toString().should.equal(amount.toString())
+                event._from.should.equal(deployer)
+                event._to.should.equal(receiver)
+                event._value.toString().should.equal(amount.toString())
             })
         } )
 
@@ -84,6 +84,93 @@ contract('Token', ([deployer, receiver]) => {
 
             it('transfer tokens to invalid account', async () => {
                 await token.transfer(0x0, getTokens(100), {from: deployer}).should.be.rejected
+            })
+        } )
+    })
+
+    describe('approve tokens', () => {
+        describe('success', () => {
+            let amount
+            let result
+
+            beforeEach(async () => {
+                amount = getTokens(100)
+                result = await token.approve(exchange, amount, {from: deployer})
+            })
+
+            it('check allowance', async () => {
+                const allowance = await token.allowance(deployer, exchange)
+                allowance.toString().should.equal(amount.toString())
+            })
+
+            it('emit transfer event', async () => {
+                const log = result.logs[0]
+                const event = log.args
+
+                log.event.should.equal('Approval')
+                event._owner.should.equal(deployer)
+                event._spender.should.equal(exchange)
+                event._value.toString().should.equal(amount.toString())
+            })
+        } )
+
+        describe('failure', () => {
+            it('approve from invalid account', async () => {
+                await token.approve(0x0, getTokens(100), {from: deployer}).should.be.rejected
+            })
+        } )
+    })
+
+    describe('transferFrom tokens', () => {
+        let amount
+
+        beforeEach(async () => {
+            amount = getTokens(1000);
+            await token.approve(exchange, amount, {from: deployer})
+        })
+
+        describe('success', () => {
+            let result
+
+            beforeEach(async () => {
+                result = await token.transferFrom(deployer, receiver, amount, {from: exchange})
+            })
+
+            it('transfer tokens to address', async () => {
+                const balanceOfDeployer = await token.balanceOf(deployer)
+                const balanceOfReceiver = await token.balanceOf(receiver)
+
+                balanceOfDeployer.toString().should.equal(getTokens(999000).toString())
+                balanceOfReceiver.toString().should.equal(amount.toString())
+            })
+
+            it('emit transfer event', async () => {
+                const log = result.logs[0]
+                const event = log.args
+
+                log.event.should.equal('Transfer')
+                event._from.should.equal(deployer)
+                event._to.should.equal(receiver)
+                event._value.toString().should.equal(amount.toString())
+            })
+
+            it('reset allowance', async () => {
+                const allowance = await token.allowance(deployer, exchange)
+                allowance.toString().should.equal('0')
+            })
+        } )
+
+        describe('failure', () => {
+            it('transfer tokens invalid amount', async () => {
+                await token.transferFrom(deployer, receiver, getTokens(10000000), {from: exchange}).should.be.rejectedWith(EVM_ERROR)
+            })
+
+            it('transfer tokens invalid allowance', async () => {
+                await token.transferFrom(deployer, receiver, getTokens(10000), {from: exchange}).should.be.rejectedWith(EVM_ERROR)
+            })
+
+            it('transfer tokens to invalid account', async () => {
+                await token.transferFrom(deployer, 0x0, amount, {from: exchange}).should.be.rejected
             })
         } )
     })

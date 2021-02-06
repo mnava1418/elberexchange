@@ -12,6 +12,7 @@ contract Exchange {
     mapping(address => mapping(address => uint256)) public tokens;
 
     event Deposit(address _token, address _user, uint256 _amount, uint256 _balance);
+    event WithDraw(address _token, address _user, uint256 _amount, uint256 _balance);
 
     constructor(address _feeAccount, uint256 _feePercent) public {
         feeAccount = _feeAccount;
@@ -24,9 +25,27 @@ contract Exchange {
         emit Deposit(_token, msg.sender, _value, tokens[_token][msg.sender]);
     }
 
+    function withdrawTokens(address _token, uint256 _amount) public {
+        require(tokens[_token][msg.sender] >= _amount);
+        require(Token(_token).transfer(msg.sender, _amount));
+        tokens[_token][msg.sender] = tokens[_token][msg.sender].sub(_amount);
+        emit WithDraw(_token, msg.sender, _amount, tokens[_token][msg.sender]);
+    }
+
     function depositETH () payable public {
         tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].add(msg.value);
         emit Deposit(ETHER, msg.sender, msg.value, tokens[ETHER][msg.sender]);
+    }
+
+    function withdrawETH (uint256 _amount) public{
+        require(tokens[ETHER][msg.sender] >= _amount);
+        msg.sender.transfer(_amount);
+        tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].sub(_amount);
+        emit WithDraw(ETHER, msg.sender, _amount, tokens[ETHER][msg.sender]);
+    }
+
+    function checkBalance (address _token, address _user ) public view returns (uint256) {
+        return tokens[_token][_user];
     }
 
     //Fallback funtion: reverts if ETH is sent directly to the smart contract

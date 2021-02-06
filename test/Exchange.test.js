@@ -112,7 +112,7 @@ contract('Exchange', ([deployer, feeAccount, user1]) => {
 
         describe('failure', () => {
             it('deposit eth not available', async () => {
-                await await exchange.depositETH({from: user1, value: getTokens(1000)}).should.be.rejected
+                await exchange.depositETH({from: user1, value: getTokens(1000)}).should.be.rejected
             })
         } )
     })
@@ -120,6 +120,108 @@ contract('Exchange', ([deployer, feeAccount, user1]) => {
     describe('fallback', async () => {
         it('revert when ETH is sent', async () => {
             await exchange.sendTransaction({value: getTokens(80), from: user1}).should.be.rejected
+        })
+    })
+
+    describe('withdraw ETH', async () => {
+        let result
+        const amount = getTokens(1)
+        
+        beforeEach(async () => {
+            await exchange.depositETH({from: user1, value: amount})
+            result = await exchange.withdrawETH(amount,{from: user1})
+        })
+
+        describe('success', () => {
+
+            it('tracks the withdraw', async () => {
+                const balance = await exchange.tokens(ETH, user1)
+                balance.toString().should.equal(getTokens(0).toString())
+
+                const exchaneETHBalance = await eth.getBalance(exchange.address)
+                exchaneETHBalance.toString().should.equal(getTokens(0).toString())
+            })
+
+            it('emit withdraw event', async () => {
+                const log = result.logs[0]
+                const event = log.args
+
+                log.event.should.equal('WithDraw')
+                event._token.should.equal(ETH)
+                event._user.should.equal(user1)
+                event._amount.toString().should.equal(amount.toString())
+                event._balance.toString().should.equal(getTokens(0).toString())
+            })
+        })
+
+        describe('failure', () => {
+            it('withdraw eth not available', async () => {
+                await exchange.withdrawETH(getTokens(100),{from: user1}).should.be.rejected
+            })
+        } )
+    })
+
+    describe('withdraw Tokens', () => {
+        let result
+        const amount = getTokens(10)
+
+        describe('success', () => {
+
+            beforeEach(async () => {
+                await token.approve(exchange.address, amount, {from: user1})
+                await exchange.depositTokens(token.address, amount, {from: user1})
+                result = await exchange.withdrawTokens(token.address, amount, {from: user1})
+            })
+
+            it('tracks the withdraw', async () => {
+                const exchangeBalance = await token.balanceOf(exchange.address)
+                const userBalance = await token.balanceOf(user1)
+
+                exchangeBalance.toString().should.equal(getTokens(0).toString())
+                userBalance.toString().should.equal(getTokens(100).toString()) 
+                
+                const tokenBalance = await exchange.tokens(token.address, user1)
+                tokenBalance.toString().should.equal(getTokens(0).toString())
+            })
+
+            it('emit withdraw event', async () => {
+                const log = result.logs[0]
+                const event = log.args
+
+                log.event.should.equal('WithDraw')
+                event._token.should.equal(token.address)
+                event._user.should.equal(user1)
+                event._amount.toString().should.equal(amount.toString())
+                event._balance.toString().should.equal(getTokens(0).toString())
+            })
+        })
+
+        describe('failure', () => {
+            it('withdraw token not available', async () => {
+                await exchange.withdrawTokens(getTokens(100),{from: user1}).should.be.rejected
+            })
+        } )
+    })
+
+    describe('check Balance', () => {
+
+        const tokenAmount = getTokens(10)
+        const ethAmount = getTokens(1)
+
+        beforeEach(async () => {
+            await token.approve(exchange.address, tokenAmount, {from: user1})
+            await exchange.depositTokens(token.address, tokenAmount, {from: user1})
+            await exchange.depositETH({from: user1, value: ethAmount})
+        })
+
+        it('check token balance', async () => {
+            const balance = await exchange.checkBalance(token.address, user1, {from: user1})
+            balance.toString().should.equal(tokenAmount.toString())
+        })
+
+        it('check eth balance', async () => {
+            const balance = await exchange.checkBalance(ETH, user1, {from: user1})
+            balance.toString().should.equal(ethAmount.toString())
         })
     })
 })

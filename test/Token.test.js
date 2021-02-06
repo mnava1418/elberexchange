@@ -37,8 +37,8 @@ contract('Token', ([deployer, receiver, exchange]) => {
         })
 
         it('tracks the totalSupply', async () => {
-            const totalSupply = await token.totalSupply()
-            totalSupply.toString().should.equal(totalSupply.toString())
+            const result = await token.totalSupply()
+            result.toString().should.equal(totalSupply.toString())
         })
 
         it('assign totalSupply to deployer', async () => {

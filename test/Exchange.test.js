@@ -224,4 +224,73 @@ contract('Exchange', ([deployer, feeAccount, user1]) => {
             balance.toString().should.equal(ethAmount.toString())
         })
     })
+
+    describe('order actions', () => {
+        let result
+        beforeEach( async()=> {
+            result = await exchange.createOrder(token.address, getTokens(1), ETH, getTokens(1), {from: user1})
+        })
+
+        describe('create order', () => {
+            it('track create order', async () => {
+                const orderCount = await exchange.orderCount()
+                orderCount.toString().should.equal('1')
+            })
+
+            it('emit Order event', async () => {
+                const log = result.logs[0]
+                const event = log.args
+
+                log.event.should.equal('Order')
+                event.id.toString().should.equal('1')
+                event.user.should.equal(user1)
+                event.tokenGet.should.equal(token.address)
+                event.amountGet.toString().should.equal(getTokens(1).toString())
+                event.tokenGive.should.equal(ETH)
+                event.amountGive.toString().should.equal(getTokens(1).toString())
+            })
+        })
+
+        describe('cancel order', () => {
+            describe('success', async() => {
+                let result
+                beforeEach(async() => {
+                    await exchange.createOrder(token.address, getTokens(1), ETH, getTokens(1), {from: user1})
+                    result = await exchange.cancelOrder(1, {from: user1})
+                })
+
+                it('track cancel order', async() => {
+                    const cancel = await exchange.canceledOrders(1)
+                    cancel.toString().should.equal('true')
+                } )
+
+                it('emit Cancel event', async () => {
+                    const log = result.logs[0]
+                    const event = log.args
+    
+                    log.event.should.equal('Cancel')
+                    event.id.toString().should.equal('1')
+                    event.user.should.equal(user1)
+                    event.tokenGet.should.equal(token.address)
+                    event.amountGet.toString().should.equal(getTokens(1).toString())
+                    event.tokenGive.should.equal(ETH)
+                    event.amountGive.toString().should.equal(getTokens(1).toString())
+                })
+            })
+
+            describe('failure', async() => {
+                beforeEach(async() => {
+                    await exchange.createOrder(token.address, getTokens(1), ETH, getTokens(1), {from: user1})
+                })
+
+                it('invalid user', async() => {
+                    await exchange.cancelOrder(1, {from: deployer}).should.be.rejected
+                } )
+
+                it('invalid id', async() => {
+                    await exchange.cancelOrder(999, {from: user1}).should.be.rejected
+                } )
+            })
+        })
+    })
 })

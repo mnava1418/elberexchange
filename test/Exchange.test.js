@@ -1,3 +1,4 @@
+const { fill } = require('lodash');
 const web3 = require('web3')
 const eth = new web3(web3.givenProvider).eth;
 const Exchange = artifacts.require('./Exchange')
@@ -15,7 +16,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Exchange', ([deployer, feeAccount, user1]) => {
+contract('Exchange', ([deployer, feeAccount, user1, user2]) => {
     let token
     let exchange
     const feePercent = 10
@@ -76,6 +77,11 @@ contract('Exchange', ([deployer, feeAccount, user1]) => {
         describe('failure', () => {
             it('deposit not approved tokens', async () => {
                 await exchange.depositTokens(token.address, amount, {from: user1}).should.be.rejectedWith(EVM_ERROR)
+            })
+
+            it('deposit invalid amount', async() => {
+                await token.approve(exchange.address, getTokens(1000), {from: user1})
+                await exchange.depositTokens(token.address, getTokens(1000), {from: user1}).should.be.rejected
             })
         } )
     })
@@ -228,26 +234,94 @@ contract('Exchange', ([deployer, feeAccount, user1]) => {
     describe('order actions', () => {
         let result
         beforeEach( async()=> {
+            await exchange.depositETH({from: user1, value:getTokens(1)})
             result = await exchange.createOrder(token.address, getTokens(1), ETH, getTokens(1), {from: user1})
         })
 
         describe('create order', () => {
-            it('track create order', async () => {
-                const orderCount = await exchange.orderCount()
-                orderCount.toString().should.equal('1')
+            describe('success', () => {
+                it('track create order', async () => {
+                    const orderCount = await exchange.orderCount()
+                    orderCount.toString().should.equal('1')
+                })
+    
+                it('emit Order event', async () => {
+                    const log = result.logs[0]
+                    const event = log.args
+    
+                    log.event.should.equal('Order')
+                    event.id.toString().should.equal('1')
+                    event.user.should.equal(user1)
+                    event.tokenGet.should.equal(token.address)
+                    event.amountGet.toString().should.equal(getTokens(1).toString())
+                    event.tokenGive.should.equal(ETH)
+                    event.amountGive.toString().should.equal(getTokens(1).toString())
+                })
             })
 
-            it('emit Order event', async () => {
-                const log = result.logs[0]
-                const event = log.args
+            describe('failure', () => {
+                it('insuficient tokens', async () => {
+                    await exchange.createOrder(token.address, getTokens(1), ETH, getTokens(100), {from: user1}).should.be.rejected
+                })
+            })
+        })
 
-                log.event.should.equal('Order')
-                event.id.toString().should.equal('1')
-                event.user.should.equal(user1)
-                event.tokenGet.should.equal(token.address)
-                event.amountGet.toString().should.equal(getTokens(1).toString())
-                event.tokenGive.should.equal(ETH)
-                event.amountGive.toString().should.equal(getTokens(1).toString())
+        describe('fill order', () => {
+            describe('success', async () => {
+
+                beforeEach(async () => {
+                    await token.transfer(user2, getTokens(2), {from: deployer})
+                    await token.approve(exchange.address, getTokens(2), {from: user2})
+                    await exchange.depositTokens(token.address, getTokens(2), {from: user2})
+
+                    result = await exchange.fillOrder(1, {from: user2})
+                })
+
+                it('track fill order', async () => {
+
+                    let balance
+                    balance = await exchange.checkBalance(token.address, user1)
+                    balance.toString().should.equal(getTokens(1).toString(), 'user 1 receive tokens')
+                    balance = await exchange.checkBalance(ETH, user2)
+                    balance.toString().should.equal(getTokens(1).toString(), 'user 2 receive ETH')
+                    balance = await exchange.checkBalance(ETH, user1)
+                    balance.toString().should.equal(getTokens(0).toString(), "user 1 gives ETH")
+                    balance = await exchange.checkBalance(token.address, user2)
+                    balance.toString().should.equal(getTokens(0.9).toString(), "user 1 gives tokens")
+
+                    const feeAccount = await exchange.feeAccount()
+                    balance = await exchange.checkBalance(token.address, feeAccount)
+                    balance.toString().should.equal(getTokens(0.1).toString(), "feeAccount receives fee")
+                })
+
+                it('emit Trade event', async () => {
+                    const log = result.logs[0]
+                    const event = log.args
+    
+                    log.event.should.equal('Trade')
+                    event.id.toString().should.equal('1')
+                    event.user.should.equal(user1)
+                    event.userFill.should.equal(user2)
+                    event.tokenGet.should.equal(token.address)
+                    event.amountGet.toString().should.equal(getTokens(1).toString())
+                    event.tokenGive.should.equal(ETH)
+                    event.amountGive.toString().should.equal(getTokens(1).toString())
+                })
+
+                it('update filled order', async () => {
+                    const filledOrder = await exchange.filledOrders(1)
+                    filledOrder.should.equal(true)
+                })
+            })
+
+            describe('failure', async() => {
+                it('order filled', async() => {
+                    await exchange.fillOrder(1, {from: user2}).should.be.rejected
+                } )
+
+                it('invalid order', async() => {
+                    await exchange.fillOrder(100, {from: user2}).should.be.rejected
+                } )
             })
         })
 

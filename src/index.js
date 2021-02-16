@@ -1,12 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
 import 'bootstrap/dist/css/bootstrap.css'
-import App from './components/App';
-import reportWebVitals from './reportWebVitals';
+import App from './components/App'
+import reportWebVitals from './reportWebVitals'
+import configureSore from './store/configureStore'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={configureSore()}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,26 +1,24 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import './style/App.css';
-import Web3 from 'web3';
-import Token from  '../abis/Token.json'
+import { 
+  loadWeb3,
+  loadAccount,
+  loadToken,
+  loadExchange
+} from '../store/interactions'
+import { accountSelector } from '../store/selectors'
 
 class App extends React.Component {
   componentWillMount() {
-    this.loadBlockChainData()
+    this.loadBlockChainData(this.props.dispatch)
   }
   
-  async loadBlockChainData() {
-    const web3 = new Web3(Web3.givenProvider || 'http://localhost:8545')
-    const networkId = await web3.eth.net.getId()
-    const networks = Token.networks
-    const address = networks[networkId].address
-    const abi = Token.abi
-    const elberCoin = new web3.eth.Contract(abi, address)
-
-    const name = await elberCoin.methods.name().call() //call cuando solo quieres info. send es para generar una transaccion y cambiar algo en el block chain
-    const symbol = await elberCoin.methods.symbol().call()
-    
-    console.log('Name:', name )
-    console.log('Symbol:', symbol )
+  async loadBlockChainData(dispatch) {
+    const web3 = loadWeb3(dispatch)
+    await loadAccount(web3, dispatch)
+    await loadToken(web3, dispatch)
+    await loadExchange(web3, dispatch)
   }
 
   render(){
@@ -105,4 +103,9 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+  }
+}
+
+export default connect(mapStateToProps)(App);

@@ -18,8 +18,9 @@ export async function loadAccount(web3, dispatch) {
     const accounts = await web3.eth.getAccounts()
     if (accounts.length > 0) {
         dispatch(web3Account(accounts[0]))
+        return accounts[0]
     } else {
-        window.alert('Account not connected. Connect via Metamask')
+        return null
     }
 }
 
@@ -28,7 +29,7 @@ export async function loadToken(web3, dispatch) {
     const networks = Token.networks
     
     if(networks[networkId] === undefined) {
-        window.alert('ELB Token not found in current network. Update via Metamask')
+        return null
     } else {
         const address = networks[networkId].address
         const abi = Token.abi
@@ -43,7 +44,7 @@ export async function loadExchange(web3, dispatch) {
     const networks = Exchange.networks
     
     if(networks[networkId] === undefined) {
-        window.alert('Exchange not found in current network. Update via Metamask')
+        return null
     } else {
         const address = networks[networkId].address
         const abi = Exchange.abi

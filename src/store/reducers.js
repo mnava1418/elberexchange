@@ -14,7 +14,7 @@ const web3 = (state = {}, action) => {
 const token = (state = {}, action) => {
     switch (action.type) {
         case 'TOKEN_LOADED':
-            return { ...state, contract: action.token}
+            return { ...state, loaded: true, contract: action.token}
         default:
             return state
     }
@@ -23,7 +23,7 @@ const token = (state = {}, action) => {
 const exchange = (state = {}, action) => {
     switch (action.type) {
         case 'EXCHANGE_LOADED':
-            return { ...state, contract: action.exchange}
+            return { ...state, loaded: true, contract: action.exchange}
         default:
             return state
     }

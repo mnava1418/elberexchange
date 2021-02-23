@@ -12,7 +12,7 @@ import {
 import { contractsLoadedSelector } from '../store/selectors'
 
 class App extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
     this.loadBlockChainData(this.props.dispatch)
   }
   

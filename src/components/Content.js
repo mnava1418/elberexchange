@@ -1,7 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import {
+  exchangeSelector
+} from '../store/selectors'
+
+import {
+  loadOrders
+} from '../store/interactions'
 
 class Content extends React.Component {
+  componentDidMount() {
+    this.loadOrders(this.props.dispatch)
+  }
+
+  async loadOrders(dispatch)  {
+    await loadOrders(this.props.exchange, dispatch)
+  }
+
   render(){
     return (
         <div className="content">
@@ -74,6 +89,7 @@ class Content extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
+    exchange: exchangeSelector(state)
   }
 }
 

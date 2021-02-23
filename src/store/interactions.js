@@ -6,6 +6,9 @@ import {
     web3Account,  
     tokenLoaded,
     exchangeLoaded,
+    cancelOrdersLoaded,
+    filledOrdersLoaded,
+    allOrdersLoaded
 } from './actions'
 
 export function loadWeb3 (dispatch) {
@@ -52,4 +55,18 @@ export async function loadExchange(web3, dispatch) {
         dispatch(exchangeLoaded(exchange))
         return exchange
     }
+}
+
+export async function loadOrders(exchange, dispatch) {
+    const canceledOrdersEvents = await exchange.getPastEvents('Cancel', {fromBlock: 0, toBlock: 'latest'})
+    const cancelOrders = canceledOrdersEvents.map( event => event.returnValues)
+    dispatch(cancelOrdersLoaded(cancelOrders))
+
+    const filledOrdersEvents = await exchange.getPastEvents('Trade', {fromBlock: 0, toBlock: 'latest'})
+    const filledOrders = filledOrdersEvents.map( event => event.returnValues)
+    dispatch(filledOrdersLoaded(filledOrders))
+
+    const allOrdersEvents = await exchange.getPastEvents('Order', {fromBlock: 0, toBlock: 'latest'})
+    const allOrders = allOrdersEvents.map( event => event.returnValues)
+    dispatch(allOrdersLoaded(allOrders))
 }

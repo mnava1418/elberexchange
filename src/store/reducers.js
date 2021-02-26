@@ -35,7 +35,6 @@ const exchange = (state = {}, action) => {
     }
 }
 
-
 const rootReducer = combineReducers({
     web3,
     token,

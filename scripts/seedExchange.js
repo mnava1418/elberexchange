@@ -109,7 +109,7 @@ const seedExchange = async (callback) => {
         //Seed Open Order
 
         //User 1 makes 10 orders
-        for(let i = 0; i <= 10; i++) {
+        for(let i = 1; i <= 10; i++) {
             result = await exchange.createOrder(token.address, getTokens(10*i), ETH_ADDRESS, getTokens(0.01), {from: user1})
             orderId = result.logs[0].args.id
             console.log(`${user1} created order ${orderId}`)
@@ -117,7 +117,7 @@ const seedExchange = async (callback) => {
         }
 
         //User 2 makes 10 orders
-        for(let i = 0; i <= 10; i++) {
+        for(let i = 1; i <= 10; i++) {
             result = await exchange.createOrder(ETH_ADDRESS, getTokens(0.01), token.address, getTokens(10*i), {from: user2})
             orderId = result.logs[0].args.id
             console.log(`${user2} created order ${orderId}`)

@@ -1,13 +1,8 @@
 import React from 'react'
 import Trades from './Trades'
 import { connect } from 'react-redux'
-import {
-  exchangeSelector
-} from '../store/selectors'
-
-import {
-  loadOrders
-} from '../store/interactions'
+import { exchangeSelector} from '../store/selectors/index'
+import { loadOrders } from '../store/interactions/exchangeInteractions'
 
 class Content extends React.Component {
   componentDidMount() {

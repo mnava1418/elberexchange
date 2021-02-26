@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { accountSelector } from '../store/selectors'
+import { accountSelector } from '../store/selectors/index'
 
 class NavBar extends React.Component {
   render(){

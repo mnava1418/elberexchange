@@ -1,15 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './style/App.css';
+
 import NavBar from './NavBar'
 import Content from './Content'
-import { 
-  loadWeb3,
-  loadAccount,
-  loadToken,
-  loadExchange
-} from '../store/interactions'
-import { contractsLoadedSelector } from '../store/selectors'
+
+import { loadWeb3, loadAccount } from '../store/interactions/web3Interactions'
+import { loadToken } from '../store/interactions/tokenInteractions'
+import { loadExchange } from '../store/interactions/exchangeInteractions'
+import { accountSelector, contractsLoadedSelector } from '../store/selectors/index'
 
 class App extends React.Component {
   componentDidMount() {
@@ -19,23 +18,26 @@ class App extends React.Component {
   async loadBlockChainData(dispatch) {
     const web3 = loadWeb3(dispatch)
     const account = await loadAccount(web3, dispatch)
+
     const token = await loadToken(web3, dispatch)
     const exchange = await loadExchange(web3, dispatch)
 
-    if(!account) {
-      window.alert('Account not connected. Please connect via Metamask')
+    if(!token || ! exchange) {
+      window.alert('Contracts not found in current network. Please select another network via Metamask')
+      return
     }
 
-    if(!token || !exchange) {
-      window.alert('Contracts not found in current network. Please update via Metamask')
-    }
+    if(!account) {
+      window.alert('Account not connected. Please connect account via Metamask')
+      return
+    } 
   }
 
   render(){
     return (
         <div>
           <NavBar />
-          { this.props.contractsLoaded ? <Content /> : <div className="content"></div>}
+          { (this.props.contractsLoaded && this.props.account) ? <Content /> : <div className="content"></div>}
         </div>
     );
   }
@@ -43,7 +45,8 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    contractsLoaded: contractsLoadedSelector(state)
+    contractsLoaded: contractsLoadedSelector(state),
+    account: accountSelector(state)
   }
 }
 

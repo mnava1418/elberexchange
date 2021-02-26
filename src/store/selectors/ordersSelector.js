@@ -1,25 +1,7 @@
 import { get } from 'lodash'
-import { createSelector } from 'reselect'
-import { ETH_ADDRESS, fromWei} from '../utils/ethUtil'
 import moment from 'moment'
-
-const account = state => get(state, 'web3.account')
-export const accountSelector = createSelector(account, a => a)
-
-const exchange = state => get(state, 'exchange.contract')
-export const exchangeSelector = createSelector(exchange, e => e)
-
-const tokenLoaded = state => get(state, 'token.loaded', false)
-export const tokenLoadedSelector = createSelector(tokenLoaded, tl => tl)
-
-const exchangeLoaded = state => get(state, 'exchange.loaded', false)
-export const exchangeLoadedSelector = createSelector(exchangeLoaded, el => el)
-
-export const contractsLoadedSelector = createSelector(
-    tokenLoaded,
-    exchangeLoaded,
-    (tl, el) => (tl && el)
-)
+import { createSelector } from 'reselect'
+import { ETH_ADDRESS, fromWei} from '../../utils/ethUtil'
 
 const filledOrdersLoaded = state => get(state, 'exchange.filledOrders.loaded', false)
 export const filledOrdersLoadedSelector = createSelector(filledOrdersLoaded, fl => fl)

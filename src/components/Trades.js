@@ -2,10 +2,10 @@ import React from 'react'
 import Spinner from './Spinner'
 import { connect } from 'react-redux'
 
-import {
+import { 
     filledOrdersLoadedSelector,
     filledOrdersSelector
-} from '../store/selectors'
+} from '../store/selectors/ordersSelector'
 
 const showTrades = (trades) => {
     return (

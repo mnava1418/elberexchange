@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { allOrdersLoadedSelector, openOrdersSelector } from '../store/selectors/ordersSelector'
 
 const showOrders = (orders) => {
-  console.log(orders)
   return(
     <tbody>
       {orders['Buy'].map((order) => {

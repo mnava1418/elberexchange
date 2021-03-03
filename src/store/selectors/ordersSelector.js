@@ -2,6 +2,7 @@ import { get } from 'lodash'
 import moment from 'moment'
 import { createSelector } from 'reselect'
 import { ETH_ADDRESS, fromWei} from '../../utils/ethUtil'
+import {account} from './index'
 
 //Filled Orders
 const filledOrdersLoaded = state => get(state, 'exchange.filledOrders.loaded', false)
@@ -35,27 +36,55 @@ export const allOrdersLoadedSelector = createSelector(
 )
 
 const allOrders = state => get(state, 'exchange.allOrders.data', [])
-export const openOrdersSelector = createSelector(
-    allOrders,
+
+const openOrders = state => {
+    const all = allOrders(state)
+    const filled = filledOrders(state)
+    const canceled = canceledOrders(state)
+    const openOrders = getOpenOrders(all, filled, canceled)
+    return openOrders
+}
+
+
+export const openOrdersSelector = createSelector( openOrders, orders => orders )
+
+export const myTradesSelector = createSelector(
+    account,
     filledOrders,
-    canceledOrders,
-    (allOrders, filledOrders, canceledOrders) => {
-        const filledMap = getOrderMap(filledOrders)
-        const canceledMap = getOrderMap(canceledOrders)
-        
-        let openOrders = allOrders.filter( (order) => (!filledMap[order.id] && !canceledMap[order.id]) )
-        openOrders = openOrders.sort((a, b) => b.timeStamp - a.timeStamp)
-        openOrders = decorateOpenOrders(openOrders)
-        
-        const openOrdersByType = getOrdersByType(openOrders, ['Buy', 'Sell'])       
-        console.log('Open Orders: ', openOrdersByType)
-        return openOrdersByType
+    (account, orders) => {
+        let myTrades = orders.filter( (order ) => order.user === account || order.userFill === account)
+        myTrades = myTrades.sort((a,b) => b.timeStamp - a.timeStamp)
+        myTrades = decorateMyTrades(account, myTrades)
+        return myTrades
+    }
+)
+
+export const myOpenOrdersSelector = createSelector(
+    account,
+    openOrders,
+    (account, orders) => {
+        orders['Buy'] = orders['Buy'].filter( (order) => order.user === account)
+        orders['Sell'] = orders['Sell'].filter( (order) => order.user === account)
+        return orders
     }
 )
 
 /*----
 HELPER FUNCTIONS
 ----*/
+const getOpenOrders = (allOrders, filledOrders, canceledOrders) => {
+    const filledMap = getOrderMap(filledOrders)
+    const canceledMap = getOrderMap(canceledOrders)
+    
+    let openOrders = allOrders.filter( (order) => (!filledMap[order.id] && !canceledMap[order.id]) )
+    openOrders = openOrders.sort((a, b) => b.timeStamp - a.timeStamp)
+    openOrders = decorateOpenOrders(openOrders)
+    
+    const openOrdersByType = getOrdersByType(openOrders, ['Buy', 'Sell'])
+    return openOrdersByType
+}
+
+
 const getOrderMap = (orders = []) => {
     let orderMap = {}
     orders.forEach( (order) => {
@@ -89,6 +118,16 @@ const decorateFilledOrders = (orders) => {
         order = decorateOrder(order)
         order = decorateFilledOrder(order, previousOrder)
         previousOrder = order
+        return order
+    })
+
+    return orders
+}
+
+const decorateMyTrades = (account, orders) => {
+    orders = orders.map((order) => {
+        order = decorateOrder(order)
+        order = decorateMyTrade(account, order)
         return order
     })
 
@@ -151,5 +190,33 @@ const decorateOpenOrder = (order) => {
         ...order,
         orderType,
         orderTypeClass
+    })
+}
+
+const decorateMyTrade = (account, order) => {
+    let tradeTypeClass
+    let tradeSign
+    if(order.user === account) {
+        if(order.tokenGive === ETH_ADDRESS) {
+            tradeTypeClass = 'success'
+            tradeSign = '+'
+        } else {
+            tradeTypeClass = 'danger'
+            tradeSign = '-'
+        }
+    } else {
+        if(order.tokenGive === ETH_ADDRESS) {
+            tradeTypeClass = 'danger'
+            tradeSign = '-'
+        } else {
+            tradeTypeClass = 'success'
+            tradeSign = '+'
+        }
+    }
+
+    return ({
+        ...order,
+        tradeTypeClass,
+        tradeSign
     })
 }

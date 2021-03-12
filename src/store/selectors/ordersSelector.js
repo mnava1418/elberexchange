@@ -5,10 +5,10 @@ import { ETH_ADDRESS, fromWei} from '../../utils/ethUtil'
 import {account} from './index'
 
 //Filled Orders
-const filledOrdersLoaded = state => get(state, 'exchange.filledOrders.loaded', false)
+export const filledOrdersLoaded = state => get(state, 'exchange.filledOrders.loaded', false)
 export const filledOrdersLoadedSelector = createSelector(filledOrdersLoaded, fl => fl)
 
-const filledOrders = state => get(state, 'exchange.filledOrders.data', [])
+export const filledOrders = state => get(state, 'exchange.filledOrders.data', [])
 export const filledOrdersSelector = createSelector(
     filledOrders,
     (orders) => {
@@ -112,7 +112,7 @@ const decorateOpenOrders = (orders) => {
     return orders
 }
 
-const decorateFilledOrders = (orders) => {
+export const decorateFilledOrders = (orders) => {
     let previousOrder = orders[0]
     orders = orders.map((order) => {
         order = decorateOrder(order)

@@ -2,10 +2,11 @@ import Exchange from '../../abis/Exchange.json'
 import { 
     allOrdersLoaded, 
     cancelOrdersLoaded, 
+    cancelOrderAction,
     filledOrdersLoaded
 } from '../actions/ordersActions'
 
-import { exchangeLoaded } from '../actions/exchangeActions'
+import { exchangeLoaded, performingAction } from '../actions/exchangeActions'
 
 export const loadExchange = async (web3, dispatch) => {
     const networkId = await web3.eth.net.getId()
@@ -34,4 +35,25 @@ export const loadOrders = async (exchange, dispatch) => {
     const allOrdersEvents = await exchange.getPastEvents('Order', {fromBlock: 0, toBlock: 'latest'})
     const allOrders = allOrdersEvents.map( event => event.returnValues)
     dispatch(allOrdersLoaded(allOrders))
+}
+
+export const subscribeToEvents = (exchange, dispatch) => {
+    exchange.events.Cancel()
+    .on('data', (event) => {
+        const order = event.returnValues
+        dispatch(cancelOrderAction(order))
+        dispatch(performingAction(false))
+    })
+}
+
+export const cancelOrder = (exchange, orderId, account, dispatch) => {
+    exchange.methods.cancelOrder(orderId).send({from: account})
+    .on('transactionHash', (hash) => {
+        dispatch(performingAction(true))
+    })
+    .on('error', (err) => {
+        console.error(err)
+        window.alert(err.message)
+    });
+    
 }

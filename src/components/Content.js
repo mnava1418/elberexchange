@@ -5,15 +5,20 @@ import MyTransactions from './MyTransactions'
 import PriceChart from './PriceChart'
 import { connect } from 'react-redux'
 import { exchangeSelector} from '../store/selectors/index'
-import { loadOrders } from '../store/interactions/exchangeInteractions'
+import { loadOrders, subscribeToEvents } from '../store/interactions/exchangeInteractions'
 
 class Content extends React.Component {
   componentDidMount() {
     this.loadOrders(this.props.dispatch)
+    this.subscribeToEvents(this.props.dispatch)
   }
 
   async loadOrders(dispatch)  {
     await loadOrders(this.props.exchange, dispatch)
+  }
+
+  subscribeToEvents(dispatch) {
+    subscribeToEvents(this.props.exchange, dispatch)
   }
 
   render(){

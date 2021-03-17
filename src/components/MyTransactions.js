@@ -2,6 +2,8 @@ import React from 'react'
 import { Tabs, Tab } from 'react-bootstrap'
 import Spinner from './Spinner'
 import { connect } from 'react-redux'
+import {cancelOrder} from '../store/interactions/exchangeInteractions'
+import {accountSelector, exchangeSelector, performingActionSelector} from '../store/selectors'
 
 import { 
     allOrdersLoadedSelector,
@@ -26,24 +28,36 @@ const showMyTrades = (trades) => {
     )
 }
 
-const showMyOrders = (orders) => {
-    return(
+const showMyOrders = (props) => {
+  const {myOpenOrders, exchange, account, dispatch} = props
+
+  return(
         <tbody>
-          {orders['Buy'].map((order) => {
+          {myOpenOrders['Buy'].map((order) => {
             return(
               <tr className={`order-${order.id}`} key={order.id}>
                 <td className={`text-${order.orderTypeClass}`}>{order.tokenAmount}</td>
                 <td className={`text-${order.orderTypeClass}`}>{order.tokenPrice}</td>
                 <td className={`text-${order.orderTypeClass}`}>{order.ethAmount}</td>
+                <td className="text-muted cancel-order" 
+                  onClick={() => {cancelOrder(exchange, order.id, account, dispatch)}}
+                >
+                  X
+                </td>
               </tr>
             )
           })}
-          {orders['Sell'].map((order) => {
+          {myOpenOrders['Sell'].map((order) => {
             return(
               <tr className={`order-${order.id}`} key={order.id}>
                 <td className={`text-${order.orderTypeClass}`}>{order.tokenAmount}</td>
                 <td className={`text-${order.orderTypeClass}`}>{order.tokenPrice}</td>
                 <td className={`text-${order.orderTypeClass}`}>{order.ethAmount}</td>
+                <td className="text-muted cancel-order" 
+                  onClick={() => {cancelOrder(exchange, order.id, account, dispatch)}}
+                >
+                  X
+                </td>
               </tr>
             )
           })}
@@ -79,9 +93,10 @@ class MyTransactions extends React.Component {
                                 <th>ELB</th>
                                 <th>ELB/ETH</th>
                                 <th>ETH</th>
+                                <th> Cancel</th>
                             </tr>
                         </thead>
-                        { this.props.ordersLoaded ? showMyOrders(this.props.myOpenOrders) : <Spinner type="table"/> }
+                        { this.props.showOrders ? showMyOrders(this.props) : <Spinner type="table"/> }
                     </table>
                 </Tab>    
             </Tabs>
@@ -92,11 +107,18 @@ class MyTransactions extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+
+    const ordersLoaded= allOrdersLoadedSelector(state)
+    const performingAction = performingActionSelector(state)
+    const showOrders = ordersLoaded && !performingAction
+
   return {
       filledOrdersLoaded: filledOrdersLoadedSelector(state),
       myTrades: myTradesSelector(state),
-      ordersLoaded: allOrdersLoadedSelector(state),
-      myOpenOrders: myOpenOrdersSelector(state)
+      myOpenOrders: myOpenOrdersSelector(state),
+      exchange: exchangeSelector(state),
+      account: accountSelector(state),
+      showOrders: showOrders,
   }
 }
 

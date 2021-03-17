@@ -7,6 +7,9 @@ export const accountSelector = createSelector(account, a => a)
 const exchange = state => get(state, 'exchange.contract')
 export const exchangeSelector = createSelector(exchange, e => e)
 
+const performingAction = state => get(state, 'exchange.performing', false)
+export const performingActionSelector = createSelector(performingAction, p => p)
+
 const tokenLoaded = state => get(state, 'token.loaded', false)
 const exchangeLoaded = state => get(state, 'exchange.loaded', false)
 

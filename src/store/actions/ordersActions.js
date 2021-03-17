@@ -18,3 +18,10 @@ export const allOrdersLoaded = (allOrders) => {
         allOrders
     }
 }
+
+export const cancelOrderAction = (order) => {
+    return {
+        type: 'CANCEL_ORDER',
+        order
+    }
+}

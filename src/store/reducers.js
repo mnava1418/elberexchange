@@ -29,7 +29,14 @@ const exchange = (state = {}, action) => {
         case 'FILLED_ORDERS_LOADED':
             return { ...state, filledOrders: {loaded: true, data: action.filledOrders} }
         case 'ALL_ORDERS_LOADED':
-                return { ...state, allOrders: {loaded: true, data: action.allOrders} }
+            return { ...state, allOrders: {loaded: true, data: action.allOrders} }
+        case 'PERFORMING_ACTION':
+            return {...state, performing: action.performing}
+        case 'CANCEL_ORDER': {
+            let currentCanceledOrders = state.canceledOrders.data
+            currentCanceledOrders.push(action.order)
+            return { ...state, canceledOrders: {loaded: true, data: currentCanceledOrders} }
+        }
         default:
             return state
     }

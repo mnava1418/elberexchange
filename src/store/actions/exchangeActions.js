@@ -4,3 +4,10 @@ export const exchangeLoaded = (exchange) => {
         exchange
     }
 }
+
+export const performingAction = (performing) => {
+    return {
+        type: 'PERFORMING_ACTION',
+        performing
+    }
+}

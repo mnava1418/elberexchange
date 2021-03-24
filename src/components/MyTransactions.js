@@ -72,7 +72,7 @@ class MyTransactions extends React.Component {
                         { this.props.filledOrdersLoaded ? showMyTrades(this.props.myTrades) : <Spinner type="table"/> }
                     </table>
                 </Tab>
-                <Tab eventKey="buyOrders" title="Buy Orders" className="bg-dark">
+                <Tab eventKey="buyOrders" title="Buy" className="bg-dark">
                     <table className="table table-dark table-sm small">   
                         <thead>
                             <tr>
@@ -85,7 +85,7 @@ class MyTransactions extends React.Component {
                         { this.props.showOrders ? showMyOrders(this.props, 'Buy') : <Spinner type="table"/> }
                     </table>
                 </Tab>
-                <Tab eventKey="sellOrders" title="Sell Orders" className="bg-dark">
+                <Tab eventKey="sellOrders" title="Sell" className="bg-dark">
                     <table className="table table-dark table-sm small">   
                         <thead>
                             <tr>

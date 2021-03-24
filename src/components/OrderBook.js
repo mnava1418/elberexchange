@@ -35,12 +35,12 @@ class Content extends React.Component {
             </div>
             <div className="card-body">
               <Tabs defaultActiveKey="buyOrders" transition={false} id="orderBook" className="bg-dark text-white">
-                <Tab eventKey="buyOrders" title="Buy Orders" className="bg-dark">
+                <Tab eventKey="buyOrders" title="Buy" className="bg-dark">
                   <table className="table table-dark table-sm small">                        
                       { this.props.ordersLoaded ? showOrders(this.props.openOrders, 'Buy') : <Spinner type="table"/> }
                   </table>
                 </Tab>
-                <Tab eventKey="sellOrders" title="Sell Orders" className="bg-dark">
+                <Tab eventKey="sellOrders" title="Sell" className="bg-dark">
                   <table className="table table-dark table-sm small">                        
                       { this.props.ordersLoaded ? showOrders(this.props.openOrders, 'Sell') : <Spinner type="table"/> }
                   </table>

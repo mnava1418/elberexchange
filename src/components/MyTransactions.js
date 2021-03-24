@@ -28,26 +28,12 @@ const showMyTrades = (trades) => {
     )
 }
 
-const showMyOrders = (props) => {
+const showMyOrders = (props, type) => {
   const {myOpenOrders, exchange, account, dispatch} = props
 
   return(
         <tbody>
-          {myOpenOrders['Buy'].map((order) => {
-            return(
-              <tr className={`order-${order.id}`} key={order.id}>
-                <td className={`text-${order.orderTypeClass}`}>{order.tokenAmount}</td>
-                <td className={`text-${order.orderTypeClass}`}>{order.tokenPrice}</td>
-                <td className={`text-${order.orderTypeClass}`}>{order.ethAmount}</td>
-                <td className="text-muted cancel-order" 
-                  onClick={() => {cancelOrder(exchange, order.id, account, dispatch)}}
-                >
-                  X
-                </td>
-              </tr>
-            )
-          })}
-          {myOpenOrders['Sell'].map((order) => {
+          {myOpenOrders[type].map((order) => {
             return(
               <tr className={`order-${order.id}`} key={order.id}>
                 <td className={`text-${order.orderTypeClass}`}>{order.tokenAmount}</td>
@@ -86,7 +72,7 @@ class MyTransactions extends React.Component {
                         { this.props.filledOrdersLoaded ? showMyTrades(this.props.myTrades) : <Spinner type="table"/> }
                     </table>
                 </Tab>
-                <Tab eventKey="orders" title="Orders" className="bg-dark">
+                <Tab eventKey="buyOrders" title="Buy Orders" className="bg-dark">
                     <table className="table table-dark table-sm small">   
                         <thead>
                             <tr>
@@ -96,9 +82,22 @@ class MyTransactions extends React.Component {
                                 <th> Cancel</th>
                             </tr>
                         </thead>
-                        { this.props.showOrders ? showMyOrders(this.props) : <Spinner type="table"/> }
+                        { this.props.showOrders ? showMyOrders(this.props, 'Buy') : <Spinner type="table"/> }
                     </table>
-                </Tab>    
+                </Tab>
+                <Tab eventKey="sellOrders" title="Sell Orders" className="bg-dark">
+                    <table className="table table-dark table-sm small">   
+                        <thead>
+                            <tr>
+                                <th>ELB</th>
+                                <th>ELB/ETH</th>
+                                <th>ETH</th>
+                                <th> Cancel</th>
+                            </tr>
+                        </thead>
+                        { this.props.showOrders ? showMyOrders(this.props, 'Sell') : <Spinner type="table"/> }
+                    </table>
+                </Tab>        
             </Tabs>
             </div>
         </div>

@@ -45,7 +45,6 @@ const openOrders = state => {
     return openOrders
 }
 
-
 export const openOrdersSelector = createSelector( openOrders, orders => orders )
 
 export const myTradesSelector = createSelector(
@@ -68,6 +67,12 @@ export const myOpenOrdersSelector = createSelector(
         return orders
     }
 )
+
+const cancelingOrder = state => get(state, 'exchange.cancelingOrder', false)
+export const cancelingOrderSelector = createSelector(cancelingOrder, p => p)
+
+const fillingOrder = state => get(state, 'exchange.fillingOrder', false)
+export const fillingOrderSelector = createSelector(fillingOrder, p => p)
 
 /*----
 HELPER FUNCTIONS

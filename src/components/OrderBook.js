@@ -2,9 +2,13 @@ import React from 'react'
 import { Tabs, Tab } from 'react-bootstrap'
 import Spinner from './Spinner'
 import { connect } from 'react-redux'
-import { allOrdersLoadedSelector, openOrdersSelector } from '../store/selectors/ordersSelector'
+import { allOrdersLoadedSelector, openOrdersSelector, fillingOrderSelector } from '../store/selectors/ordersSelector'
+import { accountSelector, exchangeSelector } from '../store/selectors'
+import { fillOrder } from '../store/interactions/exchangeInteractions'
 
-const showOrders = (orders, type) => {
+const showOrders = (props, type) => {
+  const {openOrders, exchange, account, dispatch} = props
+
   return(
     <tbody>
       <tr>
@@ -12,9 +16,9 @@ const showOrders = (orders, type) => {
         <th>ELB/ETH</th>
         <th>ETH</th>
       </tr>
-      {orders[type].map((order) => {
+      {openOrders[type].map((order) => {
         return(
-          <tr className={`order-${order.id}`} key={order.id}>
+          <tr className={`order-${order.id} order-book-order`} key={order.id} onClick={() => {fillOrder(exchange, order.id, account, dispatch)}}>
             <td>{order.tokenAmount}</td>
             <td className={`text-${order.orderTypeClass}`}>{order.tokenPrice}</td>
             <td>{order.ethAmount}</td>
@@ -37,12 +41,12 @@ class Content extends React.Component {
               <Tabs defaultActiveKey="buyOrders" transition={false} id="orderBook" className="bg-dark text-white">
                 <Tab eventKey="buyOrders" title="Buy" className="bg-dark">
                   <table className="table table-dark table-sm small">                        
-                      { this.props.ordersLoaded ? showOrders(this.props.openOrders, 'Buy') : <Spinner type="table"/> }
+                      { this.props.showOrders ? showOrders(this.props, 'Buy') : <Spinner type="table"/> }
                   </table>
                 </Tab>
                 <Tab eventKey="sellOrders" title="Sell" className="bg-dark">
                   <table className="table table-dark table-sm small">                        
-                      { this.props.ordersLoaded ? showOrders(this.props.openOrders, 'Sell') : <Spinner type="table"/> }
+                      { this.props.showOrders ? showOrders(this.props, 'Sell') : <Spinner type="table"/> }
                   </table>
                 </Tab>
               </Tabs>
@@ -55,9 +59,15 @@ class Content extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+  const ordersLoaded = allOrdersLoadedSelector(state)
+  const fillingOrder = fillingOrderSelector(state)
+  const showOrders = ordersLoaded && !fillingOrder
+
   return {
-      ordersLoaded: allOrdersLoadedSelector(state),
-      openOrders: openOrdersSelector(state)
+      openOrders: openOrdersSelector(state),
+      exchange: exchangeSelector(state),
+      account: accountSelector(state),
+      showOrders: showOrders
   }
 }
 

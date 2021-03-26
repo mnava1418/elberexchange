@@ -3,10 +3,13 @@ import {
     allOrdersLoaded, 
     cancelOrdersLoaded, 
     cancelOrderAction,
-    filledOrdersLoaded
+    filledOrdersLoaded,
+    cancelingOrder,
+    fillingOrder,
+    fillOrderAction
 } from '../actions/ordersActions'
 
-import { exchangeLoaded, performingAction } from '../actions/exchangeActions'
+import { exchangeLoaded } from '../actions/exchangeActions'
 
 export const loadExchange = async (web3, dispatch) => {
     const networkId = await web3.eth.net.getId()
@@ -40,20 +43,33 @@ export const loadOrders = async (exchange, dispatch) => {
 export const subscribeToEvents = (exchange, dispatch) => {
     exchange.events.Cancel()
     .on('data', (event) => {
-        const order = event.returnValues
-        dispatch(cancelOrderAction(order))
-        dispatch(performingAction(false))
+        dispatch(cancelOrderAction(event.returnValues))
+    })
+
+    exchange.events.Trade()
+    .on('data', (event) => {
+        dispatch(fillOrderAction(event.returnValues))
     })
 }
 
 export const cancelOrder = (exchange, orderId, account, dispatch) => {
     exchange.methods.cancelOrder(orderId).send({from: account})
     .on('transactionHash', (hash) => {
-        dispatch(performingAction(true))
+        dispatch(cancelingOrder())
     })
     .on('error', (err) => {
         console.error(err)
         window.alert(err.message)
-    });
-    
+    });   
+}
+
+export const fillOrder = (exchange, orderId, account, dispatch) => {
+    exchange.methods.fillOrder(orderId).send({from: account})
+    .on('transactionHash', (hash) => {
+        dispatch(fillingOrder())
+    })
+    .on('error', (err) => {
+        console.error(err)
+        window.alert(err.message)
+    });   
 }

@@ -3,13 +3,14 @@ import { Tabs, Tab } from 'react-bootstrap'
 import Spinner from './Spinner'
 import { connect } from 'react-redux'
 import {cancelOrder} from '../store/interactions/exchangeInteractions'
-import {accountSelector, exchangeSelector, performingActionSelector} from '../store/selectors'
+import {accountSelector, exchangeSelector} from '../store/selectors'
 
 import { 
     allOrdersLoadedSelector,
     filledOrdersLoadedSelector,
     myTradesSelector,
-    myOpenOrdersSelector
+    myOpenOrdersSelector,
+    cancelingOrderSelector
 } from '../store/selectors/ordersSelector'
 
 const showMyTrades = (trades) => {
@@ -108,8 +109,8 @@ class MyTransactions extends React.Component {
 const mapStateToProps = (state) => {
 
     const ordersLoaded= allOrdersLoadedSelector(state)
-    const performingAction = performingActionSelector(state)
-    const showOrders = ordersLoaded && !performingAction
+    const cancelingOrder = cancelingOrderSelector(state)
+    const showOrders = ordersLoaded && !cancelingOrder
 
   return {
       filledOrdersLoaded: filledOrdersLoadedSelector(state),

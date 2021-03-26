@@ -19,9 +19,28 @@ export const allOrdersLoaded = (allOrders) => {
     }
 }
 
-export const cancelOrderAction = (order) => {
+export const cancelOrderAction = (orderCanceled) => {
     return {
         type: 'CANCEL_ORDER',
-        order
+        orderCanceled
+    }
+}
+
+export const cancelingOrder = () => {
+    return {
+        type: 'CANCELING_ORDER',
+    }
+}
+
+export const fillOrderAction = (orderFilled) => {
+    return {
+        type: 'FILL_ORDER',
+        orderFilled
+    }
+}
+
+export const fillingOrder = () => {
+    return {
+        type: "FILLING_ORDER",
     }
 }

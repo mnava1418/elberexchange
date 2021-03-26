@@ -7,11 +7,10 @@ import reportWebVitals from './reportWebVitals'
 import configureSore from './store/configureStore'
 
 ReactDOM.render(
-  <React.StrictMode>
     <Provider store={configureSore()}>
       <App />
-    </Provider>
-  </React.StrictMode>,
+    </Provider>,
+  
   document.getElementById('root')
 );
 

@@ -20,6 +20,17 @@ const token = (state = {}, action) => {
     }
 }
 
+const wallet = (state = {}, action) => {
+    switch (action.type) {
+        case 'WALLET_ETH_BALANCE_LOADED':
+            return {...state, ethBalance: action.ethBalance, ethBalanceLoaded: true}
+        case 'WALLET_TOKEN_BALANCE_LOADED':
+                return {...state, tokenBalance: action.tokenBalance, tokenBalanceLoaded: true}
+        default:
+            return state
+    }
+}
+
 const exchange = (state = {}, action) => {
     switch (action.type) {
         case 'EXCHANGE_LOADED':
@@ -68,7 +79,8 @@ const exchange = (state = {}, action) => {
 const rootReducer = combineReducers({
     web3,
     token,
-    exchange
+    exchange,
+    wallet
 })
 
 export default rootReducer

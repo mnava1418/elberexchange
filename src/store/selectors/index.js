@@ -1,5 +1,6 @@
 import { get } from 'lodash'
 import { createSelector } from 'reselect'
+import { formatBalance } from '../../utils/ethUtil'
 
 const web3 = state => get(state, 'web3.connection', null)
 export const web3Selector = createSelector(web3, w => w)
@@ -20,4 +21,28 @@ export const contractsLoadedSelector = createSelector(
     tokenLoaded,
     exchangeLoaded,
     (tl, el) => (tl && el)
+)
+
+const exchangeEthBalanceLoaded = state => get(state, 'exchange.ethBalanceLoaded', false)
+export const exchangeEthBalanceLoadedSelector = createSelector(exchangeEthBalanceLoaded, l => l)
+
+const exchangeEthBalance = state => get(state, 'exchange.ethBalance', 0)
+export const exchangeEthBalanceSelector = createSelector(
+    exchangeEthBalance,
+    (balance) => {
+        balance = formatBalance(balance)
+        return balance
+    }
+)
+
+const exchangeTokenBalanceLoaded = state => get(state, 'exchange.tokenBalanceLoaded', false)
+export const exchangeTokenBalanceLoadedSelector = createSelector(exchangeTokenBalanceLoaded, l => l)
+
+const exchangeTokenBalance = state => get(state, 'exchange.tokenBalance', 0)
+export const exchangeTokenBalanceSelector = createSelector(
+    exchangeTokenBalance,
+    (balance) => {
+        balance = formatBalance(balance)
+        return balance
+    }
 )

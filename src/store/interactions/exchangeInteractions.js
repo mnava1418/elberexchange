@@ -9,7 +9,8 @@ import {
     fillOrderAction
 } from '../actions/ordersActions'
 
-import { exchangeLoaded } from '../actions/exchangeActions'
+import { exchangeLoaded, ethBalanceLoaded, tokenBalanceLoaded } from '../actions/exchangeActions'
+import { ETH_ADDRESS } from '../../utils/ethUtil'
 
 export const loadExchange = async (web3, dispatch) => {
     const networkId = await web3.eth.net.getId()
@@ -72,4 +73,12 @@ export const fillOrder = (exchange, orderId, account, dispatch) => {
         console.error(err)
         window.alert(err.message)
     });   
+}
+
+export const loadExchangeBalances = async (account, exchange, token, dispatch) => {
+    const ethBalance = await exchange.methods.checkBalance(ETH_ADDRESS, account).call()
+    dispatch(ethBalanceLoaded(ethBalance))
+
+    const tokenBalance = await exchange.methods.checkBalance(token._address, account).call()
+    dispatch(tokenBalanceLoaded(tokenBalance))
 }

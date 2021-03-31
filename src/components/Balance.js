@@ -3,7 +3,18 @@ import Spinner from './Spinner'
 import { Tabs, Tab } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { loadWalletBalances } from '../store/interactions/walletInteractions'
-import { web3Selector, accountSelector, tokenSelector } from '../store/selectors'
+import { loadExchangeBalances } from '../store/interactions/exchangeInteractions'
+import { 
+    web3Selector, 
+    accountSelector, 
+    tokenSelector,
+    exchangeSelector,
+    exchangeEthBalanceLoadedSelector,
+    exchangeTokenBalanceLoadedSelector,
+    exchangeEthBalanceSelector,
+    exchangeTokenBalanceSelector
+} from '../store/selectors'
+
 import { 
     walletEthBalanceLoadedSelector, 
     walletEthBalanceSelector,
@@ -12,7 +23,7 @@ import {
 } from '../store/selectors/walletSelectors'
 
 const showBalances = (type, props) => {
-    const {walletEthBalance, walletTokenBalance} = props
+    const {walletEthBalance, walletTokenBalance, exchangeEthBalance, exchangeTokenBalance} = props
 
     return (
         <table className="table table-dark table-sm small">
@@ -25,12 +36,12 @@ const showBalances = (type, props) => {
                 <tr key={`${type}-2`}>
                     <td>ETH</td>
                     <td>{walletEthBalance}</td>
-                    <td>2</td>
+                    <td>{exchangeEthBalance}</td>
                 </tr>
                 <tr key={`${type}-3`}>
                     <td>ELB</td>
                     <td>{walletTokenBalance}</td>
-                    <td>2000</td>
+                    <td>{exchangeTokenBalance}</td>
                 </tr>
             </tbody>
         </table>
@@ -45,8 +56,9 @@ class Balance extends React.Component {
     }
 
     async loadBalances() {
-        const {web3, account, dispatch, token} = this.props
+        const {web3, account, dispatch, token, exchange} = this.props
         await loadWalletBalances(web3, account, token, dispatch)
+        await loadExchangeBalances(account, exchange, token, dispatch)
     }
  
     render(){
@@ -71,17 +83,22 @@ class Balance extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const ethBalanceLoaded = walletEthBalanceLoadedSelector(state)
-    const tokenBalanceLoaded = walletTokenBalanceLoadedSelector(state)
-    const balancesLoaded = ethBalanceLoaded && tokenBalanceLoaded
+    const walletEthBalanceLoaded = walletEthBalanceLoadedSelector(state)
+    const walletTokenBalanceLoaded = walletTokenBalanceLoadedSelector(state)
+    const exchangeEthBalanceLoaded = exchangeEthBalanceLoadedSelector(state)
+    const exchangeTokenBalanceLoaded = exchangeTokenBalanceLoadedSelector(state)
+    const balancesLoaded = walletEthBalanceLoaded && walletTokenBalanceLoaded && exchangeEthBalanceLoaded && exchangeTokenBalanceLoaded
 
     return {
         web3: web3Selector(state),
         account: accountSelector(state),
         token: tokenSelector(state),
+        exchange: exchangeSelector(state),
         balancesLoaded: balancesLoaded,
         walletEthBalance: walletEthBalanceSelector(state),
-        walletTokenBalance: walletTokenBalanceSelector(state)
+        walletTokenBalance: walletTokenBalanceSelector(state),
+        exchangeEthBalance: exchangeEthBalanceSelector(state),
+        exchangeTokenBalance: exchangeTokenBalanceSelector(state)
     }
 }
 

@@ -40,3 +40,6 @@ export const exchangeTokenBalanceSelector = createSelector(
         return balance
     }
 )
+
+const loadingBalances = state => get(state, 'exchange.loadingBalances', false)
+export const loadingBalancesSelector = createSelector(loadingBalances, l => l)

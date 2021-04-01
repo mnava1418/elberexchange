@@ -18,3 +18,10 @@ export const loadTokenBalance = (tokenBalance) => {
         tokenBalance
     }
 }
+
+export const loadingBalances = (loadingBalances) => {
+    return {
+        type: "LOADING_BALANCES",
+        loadingBalances
+    }
+}

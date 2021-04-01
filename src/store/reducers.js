@@ -75,6 +75,8 @@ const exchange = (state = {}, action) => {
             return {...state, ethBalance: action.ethBalance}
         case 'LOAD_EXCHANGE_TOKEN_BALANCE':
                 return {...state, tokenBalance: action.tokenBalance}
+        case 'LOADING_BALANCES':
+            return {...state, loadingBalances: action.loadingBalances}
         default:
             return state
     }

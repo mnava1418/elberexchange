@@ -23,9 +23,6 @@ export const contractsLoadedSelector = createSelector(
     (tl, el) => (tl && el)
 )
 
-const exchangeEthBalanceLoaded = state => get(state, 'exchange.ethBalanceLoaded', false)
-export const exchangeEthBalanceLoadedSelector = createSelector(exchangeEthBalanceLoaded, l => l)
-
 const exchangeEthBalance = state => get(state, 'exchange.ethBalance', 0)
 export const exchangeEthBalanceSelector = createSelector(
     exchangeEthBalance,
@@ -34,9 +31,6 @@ export const exchangeEthBalanceSelector = createSelector(
         return balance
     }
 )
-
-const exchangeTokenBalanceLoaded = state => get(state, 'exchange.tokenBalanceLoaded', false)
-export const exchangeTokenBalanceLoadedSelector = createSelector(exchangeTokenBalanceLoaded, l => l)
 
 const exchangeTokenBalance = state => get(state, 'exchange.tokenBalance', 0)
 export const exchangeTokenBalanceSelector = createSelector(

@@ -5,16 +5,16 @@ export const exchangeLoaded = (exchange) => {
     }
 }
 
-export const ethBalanceLoaded = (ethBalance) => {
+export const loadETHBalance = (ethBalance) => {
     return {
-        type: 'EXCHANGE_ETH_BALANCE_LOADED',
+        type: 'LOAD_EXCHANGE_ETH_BALANCE',
         ethBalance
     }
 }
 
-export const tokenBalanceLoaded = (tokenBalance) => {
+export const loadTokenBalance = (tokenBalance) => {
     return {
-        type: 'EXCHANGE_TOKEN_BALANCE_LOADED',
+        type: 'LOAD_EXCHANGE_TOKEN_BALANCE',
         tokenBalance
     }
 }

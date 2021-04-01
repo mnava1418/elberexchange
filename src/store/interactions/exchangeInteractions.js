@@ -9,7 +9,7 @@ import {
     fillOrderAction
 } from '../actions/ordersActions'
 
-import { exchangeLoaded, ethBalanceLoaded, tokenBalanceLoaded } from '../actions/exchangeActions'
+import { exchangeLoaded, loadETHBalance, loadTokenBalance } from '../actions/exchangeActions'
 import { ETH_ADDRESS } from '../../utils/ethUtil'
 
 export const loadExchange = async (web3, dispatch) => {
@@ -75,10 +75,22 @@ export const fillOrder = (exchange, orderId, account, dispatch) => {
     });   
 }
 
-export const loadExchangeBalances = async (account, exchange, token, dispatch) => {
+export const loadExchangeBalances = async (account, exchange, token, dispatch) => {   
     const ethBalance = await exchange.methods.checkBalance(ETH_ADDRESS, account).call()
-    dispatch(ethBalanceLoaded(ethBalance))
+    dispatch(loadETHBalance(ethBalance))
 
     const tokenBalance = await exchange.methods.checkBalance(token._address, account).call()
-    dispatch(tokenBalanceLoaded(tokenBalance))
+    dispatch(loadTokenBalance(tokenBalance))
+}
+
+export const depositETH = (web3, walletBalance, exchangeBalance, depositAmount, dispatch) => {
+    /*let newExchangeBalance = parseFloat(exchangeBalance) + parseFloat(depositAmount)
+    newExchangeBalance = web3.utils.toWei(newExchangeBalance.toString(), 'ether')
+    exchangeBalance = web3.utils.toWei(exchangeBalance.toString(), 'ether')
+
+    let newWalletBalance = parseFloat(walletBalance) - parseFloat(depositAmount)
+    newWalletBalance = web3.utils.toWei(newWalletBalance.toString(), 'ether')
+    walletBalance = web3.utils.toWei(walletBalance.toString(), 'ether')
+
+    dispatch(ethBalanceLoaded(newExchangeBalance))*/
 }

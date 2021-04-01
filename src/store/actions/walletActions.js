@@ -1,13 +1,13 @@
-export const ethBalanceLoaded = (ethBalance) => {
+export const loadEthBalance = (ethBalance) => {
     return {
-        type: 'WALLET_ETH_BALANCE_LOADED',
+        type: 'LOAD_WALLET_ETH_BALANCE',
         ethBalance
     }
 }
 
-export const tokenBalanceLoaded = (tokenBalance) => {
+export const loadTokenBalance = (tokenBalance) => {
     return {
-        type: 'WALLET_TOKEN_BALANCE_LOADED',
+        type: 'LOAD_WALLET_TOKEN_BALANCE',
         tokenBalance
     }
 }

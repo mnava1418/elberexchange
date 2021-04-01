@@ -22,10 +22,10 @@ const token = (state = {}, action) => {
 
 const wallet = (state = {}, action) => {
     switch (action.type) {
-        case 'WALLET_ETH_BALANCE_LOADED':
-            return {...state, ethBalance: action.ethBalance, ethBalanceLoaded: true}
-        case 'WALLET_TOKEN_BALANCE_LOADED':
-                return {...state, tokenBalance: action.tokenBalance, tokenBalanceLoaded: true}
+        case 'LOAD_WALLET_ETH_BALANCE':
+            return {...state, ethBalance: action.ethBalance}
+        case 'LOAD_WALLET_TOKEN_BALANCE':
+                return {...state, tokenBalance: action.tokenBalance}
         default:
             return state
     }
@@ -71,10 +71,10 @@ const exchange = (state = {}, action) => {
                 fillingOrder: false 
             }
         }
-        case 'EXCHANGE_ETH_BALANCE_LOADED':
-            return {...state, ethBalance: action.ethBalance, ethBalanceLoaded: true}
-        case 'EXCHANGE_TOKEN_BALANCE_LOADED':
-                return {...state, tokenBalance: action.tokenBalance, tokenBalanceLoaded: true}
+        case 'LOAD_EXCHANGE_ETH_BALANCE':
+            return {...state, ethBalance: action.ethBalance}
+        case 'LOAD_EXCHANGE_TOKEN_BALANCE':
+                return {...state, tokenBalance: action.tokenBalance}
         default:
             return state
     }

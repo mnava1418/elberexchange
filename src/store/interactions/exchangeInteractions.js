@@ -11,7 +11,7 @@ import {
 
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
 import { walletLoadEthBalance, walletLoadTokenBalance } from '../actions/walletActions'
-import { ETH_ADDRESS, getDepositBalances } from '../../utils/ethUtil'
+import { ETH_ADDRESS, getDepositBalances, getWithdrawBalances } from '../../utils/ethUtil'
 
 export const loadExchange = async (web3, dispatch) => {
     const networkId = await web3.eth.net.getId()
@@ -54,6 +54,11 @@ export const subscribeToEvents = (exchange, dispatch) => {
     })
 
     exchange.events.Deposit()
+    .on('data', (event) => {
+        dispatch(loadingBalances(false))
+    })
+
+    exchange.events.WithDraw()
     .on('data', (event) => {
         dispatch(loadingBalances(false))
     })
@@ -121,4 +126,35 @@ export const depositToken = (web3, exchange, token, account, walletBalance, exch
             window.alert(err.message)
         });
     })
+}
+
+export const withdrawETH = (web3, exchange, account, walletBalance, exchangeBalance, withdrawAmount, dispatch) => {
+    const withdrawBalances = getWithdrawBalances(web3, exchangeBalance, walletBalance, withdrawAmount)
+    
+    exchange.methods.withdrawETH(web3.utils.toWei(withdrawAmount, 'ether')).send({from: account})
+    .on('transactionHash', (hash) => {
+        dispatch(loadingBalances(true))
+        dispatch(exchangeLoadETHBalance(withdrawBalances.newExchangeBalance))
+        dispatch(walletLoadEthBalance(withdrawBalances.newWalletBalance))
+    })
+    .on('error', (err) => {
+        console.error(err)
+        window.alert(err.message)
+    });
+}
+
+export const withdrawToken = (web3, exchange, token, account, walletBalance, exchangeBalance, withdrawAmount, dispatch) => {
+    const withdrawBalances = getWithdrawBalances(web3, exchangeBalance, walletBalance, withdrawAmount)
+    withdrawAmount = web3.utils.toWei(withdrawAmount, 'ether')
+
+    exchange.methods.withdrawTokens(token._address, withdrawAmount).send({from: account})
+    .on('transactionHash', (hash) => {
+        dispatch(loadingBalances(true))
+        dispatch(exchangeLoadTokenBalance(withdrawBalances.newExchangeBalance))
+        dispatch(walletLoadTokenBalance(withdrawBalances.newWalletBalance))
+    })
+    .on('error', (err) => {
+        console.error(err)
+        window.alert(err.message)
+    });
 }

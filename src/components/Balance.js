@@ -7,7 +7,9 @@ import { loadWalletBalances } from '../store/interactions/walletInteractions'
 import { 
     loadExchangeBalances,
     depositETH,
-    depositToken
+    depositToken,
+    withdrawETH,
+    withdrawToken
 } from '../store/interactions/exchangeInteractions'
 import { 
     web3Selector, 
@@ -44,6 +46,26 @@ const deposit = (ccy, amount, props) => {
     }
 }
 
+const withdraw = (ccy, amount, props) => {
+    const {
+        web3, 
+        exchange, 
+        token, 
+        account, 
+        walletEthBalance, 
+        exchangeEthBalance, 
+        walletTokenBalance,
+        exchangeTokenBalance,
+        dispatch
+    } = props
+
+    if(ccy === 'ETH') {
+        withdrawETH(web3, exchange, account, walletEthBalance, exchangeEthBalance, amount, dispatch)
+    } else {
+        withdrawToken(web3, exchange, token, account, walletTokenBalance, exchangeTokenBalance, amount, dispatch )
+    }
+}
+
 const submitEvent = (type, props) => {
     const amount = document.getElementById(`balanceAmount${type}`).value
     const ccy = document.getElementById(`balanceCcy${type}`).value
@@ -55,9 +77,10 @@ const submitEvent = (type, props) => {
 
     if(type==='Deposit') {
         deposit(ccy, amount, props)
+    } else {
+        withdraw(ccy, amount, props)
     }
 }
-
 
 const showBalances = (type, props) => {
     const {walletEthBalance, walletTokenBalance, exchangeEthBalance, exchangeTokenBalance} = props

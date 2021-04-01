@@ -22,3 +22,14 @@ export const getDepositBalances = (web3, exchangeBalance, walletBalance, deposit
     const depositBalances = { newExchangeBalance, newWalletBalance}
     return depositBalances
 }
+
+export const getWithdrawBalances = (web3, exchangeBalance, walletBalance, withdrawAmount) => {
+    let newExchangeBalance = parseFloat(exchangeBalance) - parseFloat(withdrawAmount)
+    newExchangeBalance = web3.utils.toWei(newExchangeBalance.toString(), 'ether')
+    
+    let newWalletBalance = parseFloat(walletBalance) + parseFloat(withdrawAmount)
+    newWalletBalance = web3.utils.toWei(newWalletBalance.toString(), 'ether')
+
+    const withdrawBalances = { newExchangeBalance, newWalletBalance}
+    return withdrawBalances
+}

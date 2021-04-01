@@ -2,53 +2,107 @@ import React from 'react'
 import Spinner from './Spinner'
 import { Tabs, Tab } from 'react-bootstrap'
 import { connect } from 'react-redux'
+import { loadingBalances } from '../store/actions/exchangeActions'
 import { loadWalletBalances } from '../store/interactions/walletInteractions'
-import { loadExchangeBalances } from '../store/interactions/exchangeInteractions'
+import { 
+    loadExchangeBalances,
+    depositETH,
+    depositToken
+} from '../store/interactions/exchangeInteractions'
 import { 
     web3Selector, 
     accountSelector, 
     tokenSelector,
     exchangeSelector,
-    exchangeEthBalanceLoadedSelector,
-    exchangeTokenBalanceLoadedSelector,
     exchangeEthBalanceSelector,
-    exchangeTokenBalanceSelector
+    exchangeTokenBalanceSelector,
+    loadingBalancesSelector
 } from '../store/selectors'
 
 import { 
-    walletEthBalanceLoadedSelector, 
     walletEthBalanceSelector,
-    walletTokenBalanceLoadedSelector,
     walletTokenBalanceSelector
 } from '../store/selectors/walletSelectors'
+
+const deposit = (ccy, amount, props) => {
+    const {
+        web3, 
+        exchange, 
+        token, 
+        account, 
+        walletEthBalance, 
+        exchangeEthBalance, 
+        walletTokenBalance,
+        exchangeTokenBalance,
+        dispatch
+    } = props
+
+    if(ccy === 'ETH') {
+        depositETH(web3, exchange, account, walletEthBalance, exchangeEthBalance, amount, dispatch)
+    } else {
+        depositToken(web3, exchange, token, account, walletTokenBalance, exchangeTokenBalance, amount, dispatch )
+    }
+}
+
+const submitEvent = (type, props) => {
+    const amount = document.getElementById(`balanceAmount${type}`).value
+    const ccy = document.getElementById(`balanceCcy${type}`).value
+
+    if(isNaN(amount)) {
+        window.alert(`Amount ${amount} is not valid`)
+        return
+    }
+
+    if(type==='Deposit') {
+        deposit(ccy, amount, props)
+    }
+}
+
 
 const showBalances = (type, props) => {
     const {walletEthBalance, walletTokenBalance, exchangeEthBalance, exchangeTokenBalance} = props
 
     return (
-        <table className="table table-dark table-sm small">
-            <tbody>
-                <tr key={`${type}-1`}>
-                    <th>Token</th>
-                    <th>Wallet</th>
-                    <th>Exchange</th>
-                </tr>
-                <tr key={`${type}-2`}>
-                    <td>ETH</td>
-                    <td>{walletEthBalance}</td>
-                    <td>{exchangeEthBalance}</td>
-                </tr>
-                <tr key={`${type}-3`}>
-                    <td>ELB</td>
-                    <td>{walletTokenBalance}</td>
-                    <td>{exchangeTokenBalance}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div>
+            <table className="table table-dark table-sm small">
+                <tbody>
+                    <tr key={`${type}-1`}>
+                        <th>Token</th>
+                        <th>Wallet</th>
+                        <th>Exchange</th>
+                    </tr>
+                    <tr key={`${type}-2`}>
+                        <td>ETH</td>
+                        <td>{walletEthBalance}</td>
+                        <td>{exchangeEthBalance}</td>
+                    </tr>
+                    <tr key={`${type}-3`}>
+                        <td>ELB</td>
+                        <td>{walletTokenBalance}</td>
+                        <td>{exchangeTokenBalance}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <form className="row" onSubmit={(event) => {
+                event.preventDefault()
+                submitEvent(type, props)
+            }}>
+                <div className="col-12 col-sm pr-sm-2">
+                    <input id={`balanceAmount${type}`} type="text" placeholder="Amount" className="form-control form-control-sm bg-dark text-white" required />
+                </div>
+                <div className="col-12 col-sm pr-sm-2" style={{'padding-left': '0px'}}>
+                    <select id={`balanceCcy${type}`} className="form-control form-control-sm bg-dark text-white" required>    
+                        <option value="ETH">ETH</option>
+                        <option value="ELB">ELB</option>
+                    </select>
+                </div>
+                <div className="col-12 col-sm-auto pl-sm-0">
+                    <button type="submit" className="btn btn-primary btn-block btn-sm">{type}</button>
+                </div>
+            </form>
+        </div>
     )
 }
-
-
 
 class Balance extends React.Component {
     componentDidMount() {
@@ -57,8 +111,10 @@ class Balance extends React.Component {
 
     async loadBalances() {
         const {web3, account, dispatch, token, exchange} = this.props
+        dispatch(loadingBalances(true))
         await loadWalletBalances(web3, account, token, dispatch)
         await loadExchangeBalances(account, exchange, token, dispatch)
+        dispatch(loadingBalances(false))
     }
  
     render(){
@@ -70,10 +126,10 @@ class Balance extends React.Component {
             <div className="card-body">
                 <Tabs defaultActiveKey="deposits" transition={false} id="balance" className="bg-dark text-white">
                     <Tab eventKey="deposits" title="Deposits" className="bg-dark">
-                        {this.props.balancesLoaded ? showBalances('deposits', this.props) : <Spinner />}
+                        {!this.props.loadingBalances ? showBalances('Deposit', this.props) : <Spinner />}
                     </Tab>
                     <Tab eventKey="withdraw" title="Withdraw" className="bg-dark">
-                        {this.props.balancesLoaded ? showBalances('withdraws', this.props) : <Spinner />}
+                        {!this.props.loadingBalances ? showBalances('Withdraw', this.props) : <Spinner />}
                     </Tab>
                 </Tabs>
             </div>
@@ -83,18 +139,14 @@ class Balance extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const walletEthBalanceLoaded = walletEthBalanceLoadedSelector(state)
-    const walletTokenBalanceLoaded = walletTokenBalanceLoadedSelector(state)
-    const exchangeEthBalanceLoaded = exchangeEthBalanceLoadedSelector(state)
-    const exchangeTokenBalanceLoaded = exchangeTokenBalanceLoadedSelector(state)
-    const balancesLoaded = walletEthBalanceLoaded && walletTokenBalanceLoaded && exchangeEthBalanceLoaded && exchangeTokenBalanceLoaded
-
+    const loadingBalances = loadingBalancesSelector(state)
+   
     return {
         web3: web3Selector(state),
         account: accountSelector(state),
         token: tokenSelector(state),
         exchange: exchangeSelector(state),
-        balancesLoaded: balancesLoaded,
+        loadingBalances: loadingBalances,
         walletEthBalance: walletEthBalanceSelector(state),
         walletTokenBalance: walletTokenBalanceSelector(state),
         exchangeEthBalance: exchangeEthBalanceSelector(state),

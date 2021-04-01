@@ -11,3 +11,14 @@ export const formatBalance = (balance) => {
     balance = Math.round(balance * precision) / precision
     return balance
 }
+
+export const getDepositBalances = (web3, exchangeBalance, walletBalance, depositAmount) => {
+    let newExchangeBalance = parseFloat(exchangeBalance) + parseFloat(depositAmount)
+    newExchangeBalance = web3.utils.toWei(newExchangeBalance.toString(), 'ether')
+    
+    let newWalletBalance = parseFloat(walletBalance) - parseFloat(depositAmount)
+    newWalletBalance = web3.utils.toWei(newWalletBalance.toString(), 'ether')
+
+    const depositBalances = { newExchangeBalance, newWalletBalance}
+    return depositBalances
+}

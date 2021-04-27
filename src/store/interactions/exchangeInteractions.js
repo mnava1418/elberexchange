@@ -6,7 +6,8 @@ import {
     filledOrdersLoaded,
     cancelingOrder,
     fillingOrder,
-    fillOrderAction
+    fillOrderAction,
+    creatingOrder
 } from '../actions/ordersActions'
 
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
@@ -79,6 +80,21 @@ export const fillOrder = (exchange, orderId, account, dispatch) => {
     exchange.methods.fillOrder(orderId).send({from: account})
     .on('transactionHash', (hash) => {
         dispatch(fillingOrder())
+    })
+    .on('error', (err) => {
+        console.error(err)
+        window.alert(err.message)
+    });
+}
+
+export const createOrder = (web3, exchange, account, tokenGet, amountGet, tokenGive, amountGive, dispatch) => {
+    amountGet = web3.utils.toWei(amountGet, 'ether')
+    amountGive = web3.utils.toWei(amountGive, 'ether')
+
+
+    exchange.methods.createOrder(tokenGet, amountGet, tokenGive, amountGive).send({from: account})
+    .on('transactionHash', (hash) => {
+       dispatch(creatingOrder())
     })
     .on('error', (err) => {
         console.error(err)

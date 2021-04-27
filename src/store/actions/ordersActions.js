@@ -44,3 +44,9 @@ export const fillingOrder = () => {
         type: "FILLING_ORDER",
     }
 }
+
+export const creatingOrder = () => {
+    return {
+        type: "CREATING_ORDER"
+    }
+}

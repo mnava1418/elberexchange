@@ -74,6 +74,9 @@ export const cancelingOrderSelector = createSelector(cancelingOrder, p => p)
 const fillingOrder = state => get(state, 'exchange.fillingOrder', false)
 export const fillingOrderSelector = createSelector(fillingOrder, p => p)
 
+const creatingOrder = state => get(state, 'exchange.creatingOrder', false)
+export const creatingOrderSelector = createSelector(creatingOrder, c => c)
+
 /*----
 HELPER FUNCTIONS
 ----*/

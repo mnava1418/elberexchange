@@ -71,6 +71,8 @@ const exchange = (state = {}, action) => {
                 fillingOrder: false 
             }
         }
+        case 'CREATING_ORDER':
+            return {...state, creatingOrder: true}
         case 'LOAD_EXCHANGE_ETH_BALANCE':
             return {...state, ethBalance: action.ethBalance}
         case 'LOAD_EXCHANGE_TOKEN_BALANCE':

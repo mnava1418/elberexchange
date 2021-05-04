@@ -7,7 +7,8 @@ import {
     cancelingOrder,
     fillingOrder,
     fillOrderAction,
-    creatingOrder
+    creatingOrder,
+    createOrderAction
 } from '../actions/ordersActions'
 
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
@@ -62,6 +63,11 @@ export const subscribeToEvents = (exchange, dispatch) => {
     exchange.events.WithDraw()
     .on('data', (event) => {
         dispatch(loadingBalances(false))
+    })
+
+    exchange.events.Order()
+    .on('data', (event) => {
+        dispatch(createOrderAction(event.returnValues))
     })
 }
 

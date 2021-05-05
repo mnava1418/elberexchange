@@ -253,7 +253,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -266,7 +267,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -279,7 +281,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -298,7 +301,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -311,7 +315,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -360,7 +365,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -384,7 +390,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -427,7 +434,8 @@
       "name": "depositETH",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -464,7 +472,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -17922,12 +17931,13 @@
         }
       },
       "links": {},
-      "address": "0x0337431c0448c2795A9380086B58ebdAd6701683",
-      "transactionHash": "0xe62045fd0c5f0b0457e3fb87735cc6d218fb5edcf9603c97965d73c164ff1a17"
+      "address": "0x63bF1eD301DD15341Da3cC058Dc773E1598BC8CC",
+      "transactionHash": "0x9b27a734656391b144f41eb43c2f4a575d8658ce058051e087b5b11b43f44d3a"
     }
   },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2021-05-05T00:20:40.089Z",
+  "updatedAt": "2021-05-05T02:15:25.018Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

@@ -6,6 +6,7 @@ import { loadingBalances } from '../store/actions/exchangeActions'
 import { loadWalletBalances } from '../store/interactions/walletInteractions'
 import { 
     loadExchangeBalances,
+    subscribeToEvents,
     depositETH,
     depositToken,
     withdrawETH,
@@ -134,10 +135,18 @@ class Balance extends React.Component {
 
     async loadBalances() {
         const {web3, account, dispatch, token, exchange} = this.props
+        this.subscribeToEvents(exchange, web3, account, token, dispatch)
+        
         dispatch(loadingBalances(true))
         await loadWalletBalances(web3, account, token, dispatch)
         await loadExchangeBalances(account, exchange, token, dispatch)
         dispatch(loadingBalances(false))
+
+        
+    }
+
+    subscribeToEvents(exchange, web3, account, token, dispatch) {
+        subscribeToEvents(exchange, web3, account, token, dispatch)
     }
  
     render(){

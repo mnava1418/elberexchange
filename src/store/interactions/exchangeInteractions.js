@@ -14,6 +14,7 @@ import {
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
 import { walletLoadEthBalance, walletLoadTokenBalance } from '../actions/walletActions'
 import { ETH_ADDRESS, getDepositBalances, getWithdrawBalances } from '../../utils/ethUtil'
+import { loadWalletBalances } from '../interactions/walletInteractions'
 
 let processedOrders = {}
 let processedCanceled = {}
@@ -48,7 +49,7 @@ export const loadOrders = async (exchange, dispatch) => {
     dispatch(allOrdersLoaded(allOrders))
 }
 
-export const subscribeToEvents = (exchange, state, dispatch) => {
+export const subscribeToEvents = (exchange, web3, account, token, dispatch) => {
     exchange.events.Cancel()
     .on('data', async (event) => {
         if(processedCanceled[event.returnValues.id] === undefined) {
@@ -62,6 +63,11 @@ export const subscribeToEvents = (exchange, state, dispatch) => {
         if(processedFilled[event.returnValues.id] === undefined) {
             dispatch(orderFilled(event.returnValues))
             processedFilled[event.returnValues.id] = event.returnValues
+
+            if(event.returnValues.user === account || event.returnValues.userFill === account) {
+                await loadWalletBalances(web3, account, token, dispatch)
+                await loadExchangeBalances(account, exchange, token, dispatch)
+            }
         }
     })
 

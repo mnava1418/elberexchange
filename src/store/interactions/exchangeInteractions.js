@@ -2,7 +2,6 @@ import Exchange from '../../abis/Exchange.json'
 import { 
     allOrdersLoaded, 
     cancelOrdersLoaded, 
-    cancelOrderAction,
     filledOrdersLoaded,
     cancelingOrder,
     fillingOrder,
@@ -10,7 +9,10 @@ import {
     creatingOrder,
 } from '../actions/ordersActions'
 
-import {allOrdersSelector} from '../selectors/ordersSelector'
+import {
+    allOrdersSelector,
+    canceledOrdersSelector
+} from '../selectors/ordersSelector'
 
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
 import { walletLoadEthBalance, walletLoadTokenBalance } from '../actions/walletActions'
@@ -48,7 +50,9 @@ export const loadOrders = async (exchange, dispatch) => {
 export const subscribeToEvents = (exchange, state, dispatch) => {
     exchange.events.Cancel()
     .on('data', (event) => {
-        dispatch(cancelOrderAction(event.returnValues))
+        let canceledOrders = canceledOrdersSelector(state)
+        canceledOrders.push(event.returnValues)
+        dispatch(cancelOrdersLoaded(canceledOrders))
     })
 
     exchange.events.Trade()

@@ -25,13 +25,6 @@ export const cancelingOrder = () => {
     }
 }
 
-export const fillOrderAction = (orderFilled) => {
-    return {
-        type: 'FILL_ORDER',
-        orderFilled
-    }
-}
-
 export const fillingOrder = () => {
     return {
         type: "FILLING_ORDER",
@@ -41,5 +34,26 @@ export const fillingOrder = () => {
 export const creatingOrder = () => {
     return {
         type: "CREATING_ORDER"
+    }
+}
+
+export const orderCreated = (order) => {
+    return {
+        type: 'ORDER_CREATED',
+        order
+    }
+}
+
+export const orderCanceled = (order) => {
+    return {
+        type: 'ORDER_CANCELED',
+        order
+    }
+}
+
+export const orderFilled = (order) => {
+    return {
+        type: 'ORDER_FILLED',
+        order
     }
 }

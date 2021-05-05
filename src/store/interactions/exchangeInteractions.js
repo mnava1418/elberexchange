@@ -5,18 +5,19 @@ import {
     filledOrdersLoaded,
     cancelingOrder,
     fillingOrder,
-    fillOrderAction,
     creatingOrder,
+    orderCreated,
+    orderCanceled,
+    orderFilled
 } from '../actions/ordersActions'
-
-import {
-    allOrdersSelector,
-    canceledOrdersSelector
-} from '../selectors/ordersSelector'
 
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
 import { walletLoadEthBalance, walletLoadTokenBalance } from '../actions/walletActions'
 import { ETH_ADDRESS, getDepositBalances, getWithdrawBalances } from '../../utils/ethUtil'
+
+let processedOrders = {}
+let processedCanceled = {}
+let processedFilled = {}
 
 export const loadExchange = async (web3, dispatch) => {
     const networkId = await web3.eth.net.getId()
@@ -49,15 +50,19 @@ export const loadOrders = async (exchange, dispatch) => {
 
 export const subscribeToEvents = (exchange, state, dispatch) => {
     exchange.events.Cancel()
-    .on('data', (event) => {
-        let canceledOrders = canceledOrdersSelector(state)
-        canceledOrders.push(event.returnValues)
-        dispatch(cancelOrdersLoaded(canceledOrders))
+    .on('data', async (event) => {
+        if(processedCanceled[event.returnValues.id] === undefined) {
+            dispatch(orderCanceled(event.returnValues))
+            processedCanceled[event.returnValues.id] = event.returnValues
+        }
     })
 
     exchange.events.Trade()
-    .on('data', (event) => {
-        dispatch(fillOrderAction(event.returnValues))
+    .on('data', async (event) => {
+        if(processedFilled[event.returnValues.id] === undefined) {
+            dispatch(orderFilled(event.returnValues))
+            processedFilled[event.returnValues.id] = event.returnValues
+        }
     })
 
     exchange.events.Deposit()
@@ -72,9 +77,10 @@ export const subscribeToEvents = (exchange, state, dispatch) => {
 
     exchange.events.Order()
     .on('data', (event) => {
-        let currentOrders = allOrdersSelector(state)
-        currentOrders.push(event.returnValues)
-        dispatch(allOrdersLoaded(currentOrders))
+        if(processedOrders[event.returnValues.id] === undefined) {
+            dispatch(orderCreated(event.returnValues))
+            processedOrders[event.returnValues.id] = event.returnValues
+        }
     })
 }
 

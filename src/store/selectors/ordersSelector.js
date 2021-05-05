@@ -9,6 +9,7 @@ export const filledOrdersLoaded = state => get(state, 'exchange.filledOrders.loa
 export const filledOrdersLoadedSelector = createSelector(filledOrdersLoaded, fl => fl)
 
 export const filledOrders = state => get(state, 'exchange.filledOrders.data', [])
+export const currentFilledSelector = createSelector(filledOrders, f => f)
 export const filledOrdersSelector = createSelector(
     filledOrders,
     (orders) => {

@@ -38,26 +38,13 @@ const exchange = (state = {}, action) => {
         case 'CANCELED_ORDERS_LOADED':
             return { ...state, canceledOrders: {loaded: true, data: action.canceledOrders}, cancelingOrder: false }
         case 'FILLED_ORDERS_LOADED':
-            return { ...state, filledOrders: {loaded: true, data: action.filledOrders} }
+            return { ...state, filledOrders: {loaded: true, data: action.filledOrders}, fillingOrder: false }
         case 'ALL_ORDERS_LOADED':
             return { ...state, allOrders: {loaded: true, data: action.allOrders}, creatingOrder: false }
         case 'CANCELING_ORDER':
             return {...state, cancelingOrder: true}
         case 'FILLING_ORDER':
             return {...state, fillingOrder: true}
-        case 'FILL_ORDER': {
-            return { 
-                ...state, 
-                filledOrders: {
-                    loaded: true, 
-                    data: [
-                        ...state.filledOrders.data,
-                        action.orderFilled
-                    ]
-                }, 
-                fillingOrder: false 
-            }
-        }
         case 'CREATING_ORDER':
             return {...state, creatingOrder: true}
         case 'LOAD_EXCHANGE_ETH_BALANCE':
@@ -66,6 +53,42 @@ const exchange = (state = {}, action) => {
                 return {...state, tokenBalance: action.tokenBalance}
         case 'LOADING_BALANCES':
             return {...state, loadingBalances: action.loadingBalances}
+        case 'ORDER_CREATED':
+            return {
+                ...state, 
+                allOrders:{
+                    loaded: true,
+                    data: [
+                        ...state.allOrders.data,
+                        action.order
+                    ]
+                }, 
+                creatingOrder: false
+            }
+        case 'ORDER_CANCELED':
+            return {
+                ...state,
+                canceledOrders: {
+                    loaded: true,
+                    data: [
+                        ...state.canceledOrders.data,
+                        action.order
+                    ]
+                },
+                cancelingOrder: false
+            }
+        case 'ORDER_FILLED':
+            return {
+                ...state,
+                filledOrders: {
+                    loaded: true,
+                    data: [
+                        ...state.filledOrders.data,
+                        action.order
+                    ]
+                },
+                fillingOrder: false
+            }        
         default:
             return state
     }

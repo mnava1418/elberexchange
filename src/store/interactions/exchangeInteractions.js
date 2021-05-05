@@ -8,8 +8,9 @@ import {
     fillingOrder,
     fillOrderAction,
     creatingOrder,
-    createOrderAction
 } from '../actions/ordersActions'
+
+import {allOrdersSelector} from '../selectors/ordersSelector'
 
 import { exchangeLoaded, exchangeLoadETHBalance, exchangeLoadTokenBalance, loadingBalances } from '../actions/exchangeActions'
 import { walletLoadEthBalance, walletLoadTokenBalance } from '../actions/walletActions'
@@ -44,7 +45,7 @@ export const loadOrders = async (exchange, dispatch) => {
     dispatch(allOrdersLoaded(allOrders))
 }
 
-export const subscribeToEvents = (exchange, dispatch) => {
+export const subscribeToEvents = (exchange, state, dispatch) => {
     exchange.events.Cancel()
     .on('data', (event) => {
         dispatch(cancelOrderAction(event.returnValues))
@@ -67,7 +68,9 @@ export const subscribeToEvents = (exchange, dispatch) => {
 
     exchange.events.Order()
     .on('data', (event) => {
-        dispatch(createOrderAction(event.returnValues))
+        let currentOrders = allOrdersSelector(state)
+        currentOrders.push(event.returnValues)
+        dispatch(allOrdersLoaded(currentOrders))
     })
 }
 

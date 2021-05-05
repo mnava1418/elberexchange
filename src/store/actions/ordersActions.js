@@ -50,10 +50,3 @@ export const creatingOrder = () => {
         type: "CREATING_ORDER"
     }
 }
-
-export const createOrderAction = (orderCreated) => {
-    return {
-        type: 'CREATE_ORDER',
-        orderCreated
-    }
-}

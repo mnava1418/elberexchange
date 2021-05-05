@@ -36,6 +36,7 @@ export const allOrdersLoadedSelector = createSelector(
 )
 
 const allOrders = state => get(state, 'exchange.allOrders.data', [])
+export const allOrdersSelector = createSelector(allOrders, orders => orders)
 
 const openOrders = state => {
     const all = allOrders(state)

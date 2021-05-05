@@ -40,7 +40,7 @@ const exchange = (state = {}, action) => {
         case 'FILLED_ORDERS_LOADED':
             return { ...state, filledOrders: {loaded: true, data: action.filledOrders} }
         case 'ALL_ORDERS_LOADED':
-            return { ...state, allOrders: {loaded: true, data: action.allOrders} }
+            return { ...state, allOrders: {loaded: true, data: action.allOrders}, creatingOrder: false }
         case 'CANCELING_ORDER':
             return {...state, cancelingOrder: true}
         case 'CANCEL_ORDER': {
@@ -73,19 +73,6 @@ const exchange = (state = {}, action) => {
         }
         case 'CREATING_ORDER':
             return {...state, creatingOrder: true}
-        case 'CREATE_ORDER': {
-            return {
-                ...state,
-                allOrders: {
-                    loaded: true,
-                    data:[
-                        ...state.allOrders.data,
-                        action.orderCreated
-                    ]
-                },
-                creatingOrder: false
-            }
-        }
         case 'LOAD_EXCHANGE_ETH_BALANCE':
             return {...state, ethBalance: action.ethBalance}
         case 'LOAD_EXCHANGE_TOKEN_BALANCE':

@@ -20,7 +20,7 @@ class Content extends React.Component {
   }
 
   subscribeToEvents(dispatch) {
-    subscribeToEvents(this.props.exchange, dispatch)
+    subscribeToEvents(this.props.exchange, this.props.state, dispatch)
   }
 
   render(){
@@ -43,7 +43,8 @@ class Content extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    exchange: exchangeSelector(state)
+    exchange: exchangeSelector(state),
+    state: state
   }
 }
 

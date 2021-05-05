@@ -287,11 +287,7 @@ contract('Exchange', ([deployer, feeAccount, user1, user2]) => {
                     balance = await exchange.checkBalance(ETH, user1)
                     balance.toString().should.equal(getTokens(0).toString(), "user 1 gives ETH")
                     balance = await exchange.checkBalance(token.address, user2)
-                    balance.toString().should.equal(getTokens(0.9).toString(), "user 1 gives tokens")
-
-                    const feeAccount = await exchange.feeAccount()
-                    balance = await exchange.checkBalance(token.address, feeAccount)
-                    balance.toString().should.equal(getTokens(0.1).toString(), "feeAccount receives fee")
+                    balance.toString().should.equal(getTokens(1).toString(), "user 1 gives tokens")
                 })
 
                 it('emit Trade event', async () => {

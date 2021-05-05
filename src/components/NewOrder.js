@@ -26,21 +26,21 @@ class NewOrder extends React.Component {
 
     generateOrder (orderType) {
         const {exchange, account, token, dispatch, web3} = this.props
-        const elbAmount = parseFloat(document.getElementById('amount').value)
+        const elbAmount = parseFloat(document.getElementById(`amount${orderType}`).value)
         const ethAmount = this.state.totalAmount
 
         if(!isNaN(elbAmount) && !isNaN(ethAmount)) {
             if(orderType === 'Buy') {
                 createOrder(web3, exchange, account, token._address, elbAmount.toString(), ETH_ADDRESS, ethAmount.toString(), dispatch)
             } else {
-                createOrder(web3, exchange, account, ETH_ADDRESS, ethAmount.toString, token._address, elbAmount.toString(), dispatch)
+                createOrder(web3, exchange, account, ETH_ADDRESS, ethAmount.toString(), token._address, elbAmount.toString(), dispatch)
             }
         }
     }
 
-    calculateTotal () {
-        const amount = parseFloat(document.getElementById('amount').value)
-        const price = parseFloat(document.getElementById('price').value)
+    calculateTotal (orderType) {
+        const amount = parseFloat(document.getElementById(`amount${orderType}`).value)
+        const price = parseFloat(document.getElementById(`price${orderType}`).value)
 
         if(isNaN(amount) || isNaN(price)) {
             this.setState((state) => ({...state, totalAmount: 0}))
@@ -57,11 +57,11 @@ class NewOrder extends React.Component {
             }}>
                 <Form.Group>
                     <Form.Label>{`${orderType} (ELB)`}</Form.Label>
-                    <Form.Control id="amount" type="text" placeholder="Amount" className="form-control form-control-sm bg-dark text-white" onChange={this.calculateTotal} />
+                    <Form.Control id={`amount${orderType}`} type="text" placeholder="Amount" className="form-control form-control-sm bg-dark text-white" onChange={() => this.calculateTotal(orderType)} />
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>{`${orderType} price`}</Form.Label>
-                    <Form.Control id="price" type="text" placeholder="Price" className="form-control form-control-sm bg-dark text-white" onChange={this.calculateTotal} />
+                    <Form.Control id={`price${orderType}`} type="text" placeholder="Price" className="form-control form-control-sm bg-dark text-white" onChange={() => this.calculateTotal(orderType)} />
                 </Form.Group>
                 <Form.Group controlId="formTotal" style={{width: "100%"}}>
                     <Form.Label>Total: {this.state.totalAmount} ETH</Form.Label>

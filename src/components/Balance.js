@@ -114,7 +114,7 @@ const showBalances = (type, props) => {
                 <div className="col-12 col-sm pr-sm-2">
                     <input id={`balanceAmount${type}`} type="text" placeholder="Amount" className="form-control form-control-sm bg-dark text-white" required />
                 </div>
-                <div className="col-12 col-sm pr-sm-2" style={{paddingLeft: '0px'}}>
+                <div className="col-12 col-sm pr-sm-2">
                     <select id={`balanceCcy${type}`} className="form-control form-control-sm bg-dark text-white" required>    
                         <option value="ETH">ETH</option>
                         <option value="ELB">ELB</option>
